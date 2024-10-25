@@ -1,0 +1,18 @@
+{
+    "name": "anitaku-api",
+    "version": "1.0.0",
+    "description": "Anime Streaming, Discovery API made with Cheerio and Express. Uses data from Anitaku",
+    "main": "api.js",
+    "types": "index.d.ts",
+    "type": "module",
+    "scripts": {
+        "start": "node src/api.js"
+    },
+    "dependencies": {
+        "axios": "^1.7.7",
+        "cheerio": "^1.0.0",
+        "cors": "^2.8.5",
+        "crypto-js": "^4.2.0",
+        "express": "^4.21.1"
+    }
+}
