@@ -4,7 +4,9 @@ import cors from 'cors';
 import {
 scrapeNewRelease,
     scrapeNewSeason,
-    scrapePopular
+    scrapePopular,
+    scrapeMovie,
+    scrapeM3U8
 } from './anime_parser.js';
 
 const port = process.env.PORT || 3000;
@@ -62,6 +64,23 @@ app.get('/new-season', async(req, res) => {
         const page = req.query.page;
 
         const data = await scrapeNewSeason({ page: page });
+
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({
+            status: 500,
+            error: 'Internal Error',
+            message: err,
+        });
+    }
+});
+
+app.get('/movies', async(req, res) => {
+    try {
+        const page = req.query.page;
+        const aph = req.query.aph;
+
+        const data = await scrapeMovie({ page: page, aph: aph });
 
         res.status(200).json(data);
     } catch (err) {

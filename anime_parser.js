@@ -8,16 +8,16 @@ import {
 
 import { USER_AGENT, renameKey } from './utils.js';
 
-const Referer = 'https://gogoplay.io/';
+const Referer = 'https://s3taku.com/';
 const goload_stream_url = 'https://goload.pro/streaming.php';
 
-const BASE_URL = 'https://anitaku.pe';
+const BASE_URL = 'https://anitaku.pe/';
 
 
 export const scrapeNewRelease = async ({ page }) => {
     const list = [];
   try {
-    const newReleasePage = await axios.get(`${BASE_URL}/home.html?page=${page}`);
+    const newReleasePage = await axios.get(`${BASE_URL}home.html?page=${page}`);
     const $ = cheerio.load(newReleasePage.data);
 
     $('div.last_episodes.loaddub > ul > li').each((i, el) => {
@@ -28,7 +28,7 @@ export const scrapeNewRelease = async ({ page }) => {
             title: $(el).find('p.name > a').attr('title'),
             img: $(el).find('div > a > img').attr('src'),
             released: $(el).find('p.episode').text().trim(),
-            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href')
+            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href').split('/')[2]
         });
     });
 
@@ -42,7 +42,7 @@ export const scrapeNewRelease = async ({ page }) => {
 export const scrapePopular = async ({ page }) => {
     const list = [];
   try {
-    const popularPage = await axios.get(`${BASE_URL}/popular.html?page=${page}`);
+    const popularPage = await axios.get(`${BASE_URL}popular.html?page=${page}`);
     const $ = cheerio.load(popularPage.data);
 
     $('div.last_episodes > ul > li').each((i, el) => {
@@ -51,7 +51,7 @@ export const scrapePopular = async ({ page }) => {
             title: $(el).find('p.name > a').attr('title'),
             img: $(el).find('div > a > img').attr('src'),
             episode: $(el).find('p.released').text().trim(),
-            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href')
+            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href').split('/')[2]
         });
     });
 
@@ -65,7 +65,7 @@ export const scrapePopular = async ({ page }) => {
 export const scrapeNewSeason = async ({ page }) => {
     const list = [];
   try {
-    const newSeasonPage = await axios.get(`${BASE_URL}/new-season.html?page=${page}`);
+    const newSeasonPage = await axios.get(`${BASE_URL}new-season.html?page=${page}`);
     const $ = cheerio.load(newSeasonPage.data);
 
     $('div.last_episodes > ul > li').each((i, el) => {
@@ -74,7 +74,7 @@ export const scrapeNewSeason = async ({ page }) => {
             title: $(el).find('p.name > a').attr('title'),
             img: $(el).find('div > a > img').attr('src'),
             episode: $(el).find('p.released').text().trim(),
-            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href')
+            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href').split('/')[2]
         });
     });
 
@@ -83,6 +83,29 @@ export const scrapeNewSeason = async ({ page }) => {
     console.log(err);
     return { error: err };
   }
+};
+
+export const scrapeMovie = async ({ aph, page }) => {
+  const list = [];
+try {
+  const newSeasonPage = await axios.get(`${BASE_URL}anime-movies.html?aph=${aph}&page=${page}`);
+  const $ = cheerio.load(newSeasonPage.data);
+
+  $('div.last_episodes > ul > li').each((i, el) => {
+      list.push({
+          id: $(el).find('p.name > a').attr('href').split('/')[2],
+          title: $(el).find('p.name > a').attr('title'),
+          img: $(el).find('div > a > img').attr('src'),
+          episode: $(el).find('p.released').text().trim(),
+          animeUrl: BASE_URL + $(el).find('p.name > a').attr('href').split('/')[2]
+      });
+  });
+
+  return list;
+} catch (err) {
+  console.log(err);
+  return { error: err };
+}
 };
 
 export const scrapeM3U8 = async ({ id }) => {
