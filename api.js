@@ -2,11 +2,13 @@ import express from 'express';
 import cors from 'cors';
 
 import {
-scrapeNewRelease,
+    scrapeNewRelease,
     scrapeNewSeason,
     scrapePopular,
     scrapeMovie,
-    scrapeM3U8
+    scrapeM3U8,
+    scrapeSearch,
+    scrapeAnimeList
 } from './anime_parser.js';
 
 const port = process.env.PORT || 3000;
@@ -80,7 +82,41 @@ app.get('/movies', async(req, res) => {
         const page = req.query.page;
         const aph = req.query.aph;
 
-        const data = await scrapeMovie({ page: page, aph: aph });
+        const data = await scrapeMovie({ aph: aph, page: page });
+
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({
+            status: 500,
+            error: 'Internal Error',
+            message: err,
+        });
+    }
+});
+
+app.get('/anime-list', async(req, res) => {
+    try {
+        const page = req.query.page;
+        const aph = req.query.aph;
+
+        const data = await scrapeAnimeList({ aph: aph, page: page  });
+
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({
+            status: 500,
+            error: 'Internal Error',
+            message: err,
+        });
+    }
+});
+
+app.get('/search', async(req, res) => {
+    try {
+        const page = req.query.page;
+        const keyword = req.query.keyword;
+
+        const data = await scrapeSearch({ keyword: keyword, page: page  });
 
         res.status(200).json(data);
     } catch (err) {

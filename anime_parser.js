@@ -28,7 +28,7 @@ export const scrapeNewRelease = async ({ page }) => {
             title: $(el).find('p.name > a').attr('title'),
             img: $(el).find('div > a > img').attr('src'),
             released: $(el).find('p.episode').text().trim(),
-            animeUrl: BASE_URL + $(el).find('p.name > a').attr('href').split('/')[2]
+            animeUrl: BASE_URL + "category/" + $(el).find('p.name > a').attr('href').split('/')[1].split('-episode-')[0]
         });
     });
 
@@ -88,8 +88,8 @@ export const scrapeNewSeason = async ({ page }) => {
 export const scrapeMovie = async ({ aph, page }) => {
   const list = [];
 try {
-  const newSeasonPage = await axios.get(`${BASE_URL}anime-movies.html?aph=${aph}&page=${page}`);
-  const $ = cheerio.load(newSeasonPage.data);
+  const moviePage = await axios.get(`${BASE_URL}anime-movies.html?aph=${aph}&page=${page}`);
+  const $ = cheerio.load(moviePage.data);
 
   $('div.last_episodes > ul > li').each((i, el) => {
       list.push({
@@ -102,9 +102,53 @@ try {
   });
 
   return list;
+  } catch (err) {
+    console.log(err);
+    return { error: err };
+  }
+};
+
+export const scrapeAnimeList = async ({ aph, page }) => {
+    const list = [];
+  try {
+    const animeListPage = await axios.get(`${BASE_URL}anime-list-${aph}&page=${page}`);
+    const $ = cheerio.load(animeListPage.data);
+  
+    $('div.anime_list_body > ul > li').each((i, el) => {
+        list.push({
+            id: $(el).find('a').attr('href').split('/')[2],
+            title: $(el).find('a').attr('title'),
+            animeUrl: BASE_URL + $(el).find('a').attr('href').split('/')[2]
+        });
+    });
+
+  return list;
 } catch (err) {
   console.log(err);
   return { error: err };
+}
+};
+
+export const scrapeSearch = async ({ keyword, page = 1 }) => {
+  const list = [];
+try {
+  const searchPage = await axios.get(`${BASE_URL}search.html?keyword=${keyword}&page=${page}`);
+  const $ = cheerio.load(searchPage.data);
+
+  $('div.last_episodes > ul > li').each((i, el) => {
+      list.push({
+          id: $(el).find('div.img a').attr('href').split('/')[2],
+          title: $(el).find('p.name a').attr('title'),
+          img: $(el).find('div.img a img').attr('src'),
+          released: $(el).find('p.released').text().trim(),
+          animeUrl: BASE_URL + $(el).find('div.img a').attr('href').split('/')[2]
+      });
+  });
+
+return list;
+} catch (err) {
+console.log(err);
+return { error: err };
 }
 };
 
